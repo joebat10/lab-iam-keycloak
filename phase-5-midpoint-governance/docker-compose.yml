@@ -1,0 +1,83 @@
+name: lab-iam-phase5
+
+services:
+  midpoint-db:
+    image: postgres:16-alpine
+    container_name: midpoint-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: midpoint
+      POSTGRES_USER: midpoint
+      POSTGRES_PASSWORD: ${MIDPOINT_DB_PASSWORD:-change-me}
+    volumes:
+      - midpoint_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U midpoint"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - iam
+
+  # Initialise le schéma "native repository" de midPoint dans Postgres au
+  # premier démarrage (adapté du docker-compose.yml officiel Evolveum/midpoint-docker).
+  midpoint-init:
+    image: evolveum/midpoint:${MP_VER:-latest}-alpine
+    container_name: midpoint-init
+    depends_on:
+      midpoint-db:
+        condition: service_healthy
+    command: >
+      bash -c "
+        cd /opt/midpoint &&
+        bin/midpoint.sh init-native &&
+        bin/ninja.sh -B info >/dev/null 2>/tmp/ninja.log ;
+        grep -q ERROR /tmp/ninja.log && (
+          bin/ninja.sh run-sql --create --mode REPOSITORY &&
+          bin/ninja.sh run-sql --create --mode AUDIT
+        ) || echo 'Repository deja initialise, rien a faire.'
+      "
+    environment:
+      MP_SET_midpoint_repository_jdbcUsername: midpoint
+      MP_SET_midpoint_repository_jdbcPassword: ${MIDPOINT_DB_PASSWORD:-change-me}
+      MP_SET_midpoint_repository_jdbcUrl: jdbc:postgresql://midpoint-db:5432/midpoint
+      MP_SET_midpoint_repository_database: postgresql
+      MP_INIT_CFG: /opt/midpoint/var
+    volumes:
+      - midpoint_home:/opt/midpoint/var
+    networks:
+      - iam
+
+  midpoint:
+    image: evolveum/midpoint:${MP_VER:-latest}-alpine
+    container_name: midpoint
+    restart: unless-stopped
+    depends_on:
+      midpoint-init:
+        condition: service_completed_successfully
+      midpoint-db:
+        condition: service_healthy
+    command: ["/opt/midpoint/bin/midpoint.sh", "container"]
+    environment:
+      MP_SET_midpoint_repository_jdbcUsername: midpoint
+      MP_SET_midpoint_repository_jdbcPassword: ${MIDPOINT_DB_PASSWORD:-change-me}
+      MP_SET_midpoint_repository_jdbcUrl: jdbc:postgresql://midpoint-db:5432/midpoint
+      MP_SET_midpoint_repository_database: postgresql
+      MP_SET_midpoint_administrator_initialPassword: ${MIDPOINT_ADMIN_PASSWORD:-change-me}
+      MP_UNSET_midpoint_repository_hibernateHbm2ddl: 1
+      MP_NO_ENV_COMPAT: 1
+    ports:
+      - "8888:8080"   # décalé pour ne pas entrer en conflit avec Keycloak (8080)
+    volumes:
+      - midpoint_home:/opt/midpoint/var
+    networks:
+      - iam
+
+networks:
+  iam:
+    external: true
+    name: lab-iam-phase1_iam
+
+volumes:
+  midpoint_db_data:
+  midpoint_home:

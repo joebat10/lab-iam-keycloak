@@ -1,0 +1,16 @@
+{
+  "name": "demo-app-oidc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Client OIDC minimal (Authorization Code + PKCE + refresh) contre Keycloak, pour le lab-iam-keycloak.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "openid-client": "^6.8.4"
+  }
+}

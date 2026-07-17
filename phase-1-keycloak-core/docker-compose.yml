@@ -1,0 +1,58 @@
+name: lab-iam-phase1
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: kc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-keycloak}
+      POSTGRES_USER: ${POSTGRES_USER:-keycloak}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-keycloak}
+    volumes:
+      - kc_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-keycloak}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - iam
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.0
+    container_name: keycloak
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: start-dev --import-realm
+    environment:
+      # Mode dev volontaire pour ce lab -- voir README.md ("prod-like" plus tard)
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-keycloak}
+      KC_DB_USERNAME: ${POSTGRES_USER:-keycloak}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-keycloak}
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      # Nécessaire pour que le hostname affiché dans les tokens/endpoints
+      # corresponde à ce que ton navigateur utilise (localhost ici).
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8080:8080"   # console admin + endpoints OIDC/SAML
+      - "9000:9000"   # /health/* et /metrics (port de management dédié depuis KC 26)
+    volumes:
+      - ./realm-export:/opt/keycloak/data/import
+    networks:
+      - iam
+
+networks:
+  iam:
+    driver: bridge
+
+volumes:
+  kc_postgres_data:

@@ -1,0 +1,28 @@
+# Modèle d'autorisation ReBAC — gestion documentaire
+#
+# Objectif pédagogique : montrer qu'un "viewer" d'un dossier devient
+# automatiquement "viewer" de tous les documents qu'il contient, sans avoir à
+# écrire une seule relation supplémentaire quand un nouveau document est créé
+# dans ce dossier -- c'est l'héritage relationnel (tuple-to-userset) qu'un
+# simple rôle Keycloak ne peut pas exprimer nativement.
+#
+# Vocabulaire : "user" est un type spécial représentant un principal (ici,
+# un utilisateur -- pourrait aussi référencer un groupe ou un service).
+
+model
+  schema 1.1
+
+type user
+
+type folder
+  relations
+    define owner: [user]
+    define editor: [user] or owner
+    define viewer: [user] or editor
+
+type document
+  relations
+    define parent: [folder]
+    define owner: [user]
+    define editor: [user] or owner or editor from parent
+    define viewer: [user] or editor or viewer from parent

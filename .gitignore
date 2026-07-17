@@ -1,0 +1,26 @@
+# Secrets -- ne jamais commiter de vrais .env
+.env
+*.env
+!*.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Zitadel (fichiers récupérés dynamiquement par fetch-official-compose.sh)
+phase-6-zitadel-comparatif/docker-compose.yml
+phase-6-zitadel-comparatif/.env.example
+
+# Volumes / données locales éventuelles montées en bind mount
+**/data/
+**/*_data/
+
+# Éditeurs / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Exports contenant potentiellement des secrets si tu changes les mots de passe par défaut
+# (garde volontairement commentée : les realm exports SONT à commiter par défaut dans ce lab)
+# phase-1-keycloak-core/realm-export/*.json
