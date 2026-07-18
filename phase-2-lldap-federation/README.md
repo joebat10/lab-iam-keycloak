@@ -78,3 +78,19 @@ applicatifs.
 ## Suite
 
 → `../phase-3-oidc-saml-tokens/README.md`
+
+## Retour d'expérience (bug rencontré et corrigé)
+
+Le champ **Vendor** est resté sur `Active Directory` par défaut et n'a pas pu
+être changé après coup — sans gravité, ce champ ne fait que pré-remplir
+d'autres valeurs à la création. Les vrais correctifs à appliquer manuellement
+pour LLDAP dans "LDAP searching and updating" :
+
+- **User object classes** : `person` (PAS `inetOrgPerson` — piège classique,
+  LLDAP n'utilise pas le schéma générique inetOrgPerson).
+- **UUID LDAP attribute** : `entryUUID` (fonctionne une fois le filtre
+  d'objectClass corrigé).
+- **Username / RDN LDAP attribute** : `uid` (pas `cn`, valeur par défaut du
+  preset Active Directory).
+- **Users DN** : bien vérifier qu'il n'est pas resté vide après un changement
+  de vendor.
