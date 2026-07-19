@@ -78,6 +78,13 @@ Ce qu'on construit :
 - Tu as un utilisateur "LLDAP-native" qui se connecte à une application via Keycloak,
   sans jamais avoir été créé manuellement dans Keycloak.
 
+**Extension confirmée (à faire quand tu veux, pas bloquant)** : brancher **OpenLDAP**
+en parallèle de LLDAP sur un second provider User Federation, et comparer les deux à
+l'usage — schéma LDIF à écrire à la main, ACL plus complexes, mais nettement plus
+représentatif d'un annuaire d'entreprise réel (souvent la base d'un Active Directory
+ou d'un legacy Linux). Utile pour un profil architecte : LLDAP prouve le concept vite,
+OpenLDAP montre le vrai coût d'exploitation.
+
 ---
 
 ## Phase 3 — OIDC, SAML et cycle de vie des tokens en profondeur
@@ -102,6 +109,9 @@ Ce qu'on construit :
 - Introspection de token (`/token/introspect`) et révocation (`/logout`,
   `/revoke`) pour comprendre la différence entre un JWT auto-porteur et un
   token opaque.
+- **Bonus** : le grant **Client Credentials** (machine-à-machine, sans utilisateur
+  humain) avec le compte de service de `demo-backend` — le seul grant OAuth2 courant
+  qu'on n'aurait sinon jamais testé dans ce lab.
 
 **Definition of done** :
 
@@ -110,6 +120,8 @@ Ce qu'on construit :
   un ID Token normalisé + un moyen standard de connaître l'identité de l'utilisateur,
   là où OAuth2 seul ne fait que déléguer un accès).
 - Tu as observé une assertion SAML brute (XML, signée) au moins une fois.
+- Tu sais expliquer quand utiliser Client Credentials plutôt qu'Authorization Code
+  (réponse : dès qu'il n'y a pas d'utilisateur humain derrière l'appel).
 
 ---
 
@@ -192,9 +204,46 @@ Ce qu'on construit :
 
 ---
 
+## Phase 7 — Fédération hybride avec Microsoft Entra ID
+
+**Objectif** : ne pas rester dans un monde 100% Keycloak. La majorité des grandes
+entreprises ont déjà Entra ID (ex-Azure AD) quelque part dans leur SI — savoir le
+faire cohabiter avec un IdP self-hosted (fusion-acquisition, partenariat,
+migration progressive) est une vraie compétence d'architecte, distincte de
+"savoir utiliser Entra ID seul".
+
+Deux montages possibles, à choisir selon ce que tu veux observer :
+
+- **Entra ID comme IdP upstream de Keycloak** (Identity Brokering OIDC) :
+  Keycloak délègue l'authentification à Entra ID — utile quand Keycloak reste le
+  point d'entrée unique pour tes applications, mais que les comptes vivent dans
+  Entra ID (scénario le plus courant en entreprise : SSO centralisé sur l'IdP
+  cloud existant).
+- **Keycloak comme IdP externe d'une application enregistrée dans Entra ID** :
+  l'inverse — utile pour comprendre le point de vue d'Entra ID quand *lui* fait
+  confiance à un tiers.
+
+Ce qu'on construit :
+
+- Une application enregistrée dans ton tenant Entra ID (App registrations).
+- Un Identity Provider OIDC dans Keycloak pointant vers ce tenant (endpoints
+  `login.microsoftonline.com`), avec mapping des claims Entra ID
+  (`oid`, `upn`, groupes) vers des attributs/rôles Keycloak.
+- Un test de connexion de bout en bout avec un vrai compte de ton tenant.
+
+**Definition of done** :
+
+- Tu sais expliquer la différence entre *brokering* (Keycloak délègue à Entra ID)
+  et *fédération SP* (une appli fait confiance à Keycloak qui fait confiance à
+  Entra ID) — un attendu classique d'entretien architecte.
+- Un utilisateur réel de ton tenant Entra ID s'est connecté avec succès via
+  Keycloak.
+
+---
+
 ## Après le plan : pistes pour la suite (architecte confirmé)
 
-Une fois les 6 phases terminées, pistes crédibles pour la suite (non détaillées ici,
+Une fois les 7 phases terminées, pistes crédibles pour la suite (non détaillées ici,
 à construire au fur et à mesure) :
 
 - Haute disponibilité de Keycloak (cluster, cache distribué, Postgres répliqué).
@@ -215,7 +264,9 @@ Coche au fur et à mesure (édite ce fichier, commit à chaque étape franchie) 
 - [x] Phase 0 — Environnement prêt
 - [x] Phase 1 — Keycloak core
 - [x] Phase 2 — LLDAP + fédération
+- [ ] Phase 2 bis — OpenLDAP (comparatif, optionnel)
 - [x] Phase 3 — OIDC/SAML/tokens
 - [ ] Phase 4 — OpenFGA (ReBAC)
 - [ ] Phase 5 — midPoint (IGA)
 - [ ] Phase 6 — Comparatif Zitadel
+- [ ] Phase 7 — Entra ID (fédération hybride)
