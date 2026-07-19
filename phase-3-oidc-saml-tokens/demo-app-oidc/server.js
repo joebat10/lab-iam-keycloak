@@ -35,7 +35,16 @@ app.use(
 let mainConfig;
 async function getMainConfig() {
   if (!mainConfig) {
-    mainConfig = await client.discovery(new URL(ISSUER_URL), CLIENT_ID);
+    // ATTENTION : allowInsecureRequests désactive l'exigence HTTPS
+    // d'openid-client. Acceptable uniquement ici, contre un Keycloak local
+    // en http://localhost -- jamais contre un serveur distant/prod.
+    mainConfig = await client.discovery(
+      new URL(ISSUER_URL),
+      CLIENT_ID,
+      undefined,
+      undefined,
+      { execute: [client.allowInsecureRequests] },
+    );
   }
   return mainConfig;
 }
@@ -51,12 +60,7 @@ app.get('/', (req, res) => {
     return;
   }
 
-  let claims = null;
-  try {
-    claims = tokens.claims ? tokens.claims() : null;
-  } catch {
-    claims = null;
-  }
+  const claims = req.session.claims || null;
 
   res.send(`
     <h1>Connecté</h1>
@@ -106,7 +110,19 @@ app.get('/callback', async (req, res, next) => {
       expectedState: req.session.state,
     });
 
+    // On extrait les claims TOUT DE SUITE : tokens.claims() est une méthode,
+    // et express-session sérialise la session en JSON entre deux requêtes --
+    // une méthode ne survit pas à un JSON.stringify/parse, seules des
+    // données brutes le peuvent.
+    let claims = null;
+    try {
+      claims = tokens.claims ? tokens.claims() : null;
+    } catch {
+      claims = null;
+    }
+
     req.session.tokens = tokens;
+    req.session.claims = claims;
     res.redirect('/');
   } catch (err) {
     next(err);
@@ -123,6 +139,14 @@ app.get('/refresh', async (req, res, next) => {
     }
 
     const newTokens = await client.refreshTokenGrant(config, tokens.refresh_token);
+
+    // Même piège qu'au login : extraire les claims tout de suite, avant
+    // que la session ne soit sérialisée.
+    try {
+      req.session.claims = newTokens.claims ? newTokens.claims() : req.session.claims;
+    } catch {
+      // on garde les claims précédents si le nouvel ID token est absent/invalide
+    }
     req.session.tokens = newTokens;
 
     res.send(`
@@ -163,6 +187,8 @@ app.get('/introspect', async (req, res, next) => {
       new URL(ISSUER_URL),
       introspectionClientId,
       introspectionClientSecret,
+      undefined,
+      { execute: [client.allowInsecureRequests] },
     );
 
     const result = await client.tokenIntrospection(introspectionConfig, tokens.access_token);
