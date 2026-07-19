@@ -212,10 +212,10 @@ Une fois les 6 phases terminées, pistes crédibles pour la suite (non détaill�
 
 Coche au fur et à mesure (édite ce fichier, commit à chaque étape franchie) :
 
-- [ ] Phase 0 — Environnement prêt
-- [ ] Phase 1 — Keycloak core
-- [ ] Phase 2 — LLDAP + fédération
-- [ ] Phase 3 — OIDC/SAML/tokens
+- [x] Phase 0 — Environnement prêt
+- [x] Phase 1 — Keycloak core
+- [x] Phase 2 — LLDAP + fédération
+- [x] Phase 3 — OIDC/SAML/tokens
 - [ ] Phase 4 — OpenFGA (ReBAC)
 - [ ] Phase 5 — midPoint (IGA)
 - [ ] Phase 6 — Comparatif Zitadel
