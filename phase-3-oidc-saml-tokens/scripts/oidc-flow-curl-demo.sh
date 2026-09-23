@@ -64,8 +64,8 @@ echo
 
 read -r -p "Colle ici l'URL complète de redirection : " REDIRECT_RESULT
 
-CODE="$(grep -oE 'code=[^&]+' <<<"$REDIRECT_RESULT" | cut -d= -f2)"
-RETURNED_STATE="$(grep -oE 'state=[^&]+' <<<"$REDIRECT_RESULT" | cut -d= -f2)"
+CODE="$(grep -oE '[?&]code=[^&]+' <<<"$REDIRECT_RESULT" | cut -d= -f2)"
+RETURNED_STATE="$(grep -oE '[?&]state=[^&]+' <<<"$REDIRECT_RESULT" | head -n1 | cut -d= -f2)"
 
 if [ "$RETURNED_STATE" != "$STATE" ]; then
   echo "ERREUR : le state renvoyé ne correspond pas -- possible CSRF, on arrête ici." >&2
