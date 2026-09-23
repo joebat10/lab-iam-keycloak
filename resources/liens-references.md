@@ -86,3 +86,21 @@ de scénarios, Prague). Probable confusion de nom avec le vrai midPoint
 Je le signale explicitement pour éviter de perdre du temps dessus — mais je le
 garde dans ce fichier pour mémoire, au cas où tu avais une autre intention en
 le partageant.
+
+## Sources ajoutées après comparaison avec un programme de formation professionnelle
+
+**Programme "Keycloak, mise en oeuvre d'une gestion centralisée des accès
+utilisateurs"** (Cegos, réf. SR214, PDF fourni par l'utilisateur) : comparatif direct
+avec ce lab qui a révélé plusieurs trous à combler (SSO multi-app + Single Logout,
+MFA/WebAuthn en pratique, Groups natifs, client bearer-only, durcissement,
+TLS/sauvegarde/clustering/audit) — voir les Phases 1 (extension), 3 (Exercice D),
+4 bis et 4 ter du `ROADMAP.md`, ajoutées suite à cette analyse.
+
+<https://tech-insider.org/fr/keycloak-tutoriel-sso-open-source-2026/> — tutoriel
+Docker Compose détaillé, confirme la recette Traefik + TLS + KC_PROXY_HEADERS
+utilisée en Phase 4 ter, et une bonne table de dépannage des erreurs courantes.
+
+<https://www.zerodaycyberacademy.com/ressources/iam-identite-acces/qu-est-ce-que-keycloak>
+— article de référence sur l'architecture Keycloak (realms/clients/flows), les 7
+contrôles de durcissement standards (repris en Phase 4 bis) et un comparatif
+Keycloak vs alternatives (Authentik, Auth0, Okta, Entra ID, Ory).
