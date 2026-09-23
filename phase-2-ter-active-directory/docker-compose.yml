@@ -1,0 +1,35 @@
+name: lab-iam-phase2ter
+
+services:
+  samba-ad:
+    image: nowsci/samba-domain
+    container_name: samba-ad
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${AD_DOMAIN:-NORVALIS.LOCAL}
+      DOMAINPASS: ${AD_ADMIN_PASSWORD:?definis-un-mot-de-passe-dans-.env}
+      HOSTIP: 127.0.0.1
+      JOIN: "false"
+      INSECURELDAP: "true"
+      NOCOMPLEXITY: "true"
+    ports:
+      - "389:389"
+      - "636:636"
+      - "88:88/tcp"
+      - "88:88/udp"
+    volumes:
+      - samba_data:/var/lib/samba
+      - samba_config:/etc/samba/external
+    cap_add:
+      - SYS_ADMIN
+    networks:
+      - iam
+
+networks:
+  iam:
+    external: true
+    name: lab-iam-phase1_iam
+
+volumes:
+  samba_data:
+  samba_config:
