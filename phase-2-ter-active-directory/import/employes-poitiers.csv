@@ -1,0 +1,29 @@
+login;prenom;nom;service;fonction;groupe
+cmartin;Claire;Martin;Logistique;Responsable expedition;GG_Poitiers_Logistique
+hbernard;Hugo;Bernard;Comptabilite;Comptable;GG_Poitiers_Compta
+kbenali;Karim;Benali;IT;Technicien support;GG_Poitiers_IT
+lpetit;Lucas;Petit;Logistique;Cariste;GG_Poitiers_Logistique
+edurand;Emma;Durand;Logistique;Preparatrice de commandes;GG_Poitiers_Logistique
+trichard;Thomas;Richard;Logistique;Cariste;GG_Poitiers_Logistique
+mmoreau;Manon;Moreau;Logistique;Agent de quai;GG_Poitiers_Logistique
+nsimon;Nicolas;Simon;Logistique;Chef d'equipe entrepot;GG_Poitiers_Logistique
+claurent;Camille;Laurent;Logistique;Preparateur de commandes;GG_Poitiers_Logistique
+ymichel;Yanis;Michel;Logistique;Agent de quai;GG_Poitiers_Logistique
+sleroy;Sarah;Leroy;Comptabilite;Comptable fournisseurs;GG_Poitiers_Compta
+proux;Paul;Roux;Comptabilite;Controleur de gestion;GG_Poitiers_Compta
+jfournier;Julie;Fournier;Comptabilite;Assistante comptable;GG_Poitiers_Compta
+amorel;Antoine;Morel;Comptabilite;Comptable clients;GG_Poitiers_Compta
+lgirard;Lea;Girard;RH;Responsable RH site;GG_Poitiers_RH
+mandre;Mathieu;Andre;RH;Charge de recrutement;GG_Poitiers_RH
+cbonnet;Chloe;Bonnet;RH;Gestionnaire paie;GG_Poitiers_RH
+fdubois;Florian;Dubois;RH;Assistant RH;GG_Poitiers_RH
+mlambert;Marie;Lambert;IT;Administratrice systemes;GG_Poitiers_IT
+tfontaine;Theo;Fontaine;IT;Technicien support N1;GG_Poitiers_IT
+jrousseau;Justine;Rousseau;IT;Technicienne support N1;GG_Poitiers_IT
+avincent;Alexandre;Vincent;IT;Administrateur reseau;GG_Poitiers_IT
+lmuller;Lucie;Muller;IT;Technicienne support N2;GG_Poitiers_IT
+gblanc;Gabriel;Blanc;Logistique;Responsable entrepot adjoint;GG_Poitiers_Logistique
+ogauthier;Ocean;Gauthier;Logistique;Agent de quai;GG_Poitiers_Logistique
+pmartinez;Pauline;Martinez;Comptabilite;Comptable general;GG_Poitiers_Compta
+rlefevre;Romain;Lefevre;RH;Charge de formation;GG_Poitiers_RH
+wlopez;William;Lopez;IT;Alternant informatique;GG_Poitiers_IT
