@@ -12,6 +12,8 @@ services:
       JOIN: "false"
       INSECURELDAP: "true"
       NOCOMPLEXITY: "true"
+    dns:
+      - 127.0.0.1
     ports:
       - "389:389"
       - "636:636"
